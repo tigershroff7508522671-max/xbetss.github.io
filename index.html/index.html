@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>X-BET | Weekly Draw</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="main-content">
+  <header class="text-center mb-6">
+    <div class="brand">X-BET</div>
+    <p class="text-gray-400">30 % amount will goes to owner</p>
+  </header>
+
+  <div class="card">
+    <h2 class="text-xl font-semibold mb-3 text-blue-400">Add Participant</h2>
+    <form id="form">
+      <input type="text" id="name" placeholder="Full Name" class="w-full mb-2" required>
+      <input type="text" id="mobile" placeholder="Mobile Number" maxlength="10" pattern="[0-9]{10}" class="w-full mb-2" required>
+      <input type="number" id="amount" value="5" readonly class="w-full mb-2">
+      <button class="btn-main w-full p-2 rounded">Add</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2 class="text-xl font-semibold mb-3 text-blue-400">Participants</h2>
+    <ul id="list" class="space-y-1 text-gray-200 text-sm"></ul>
+    <p class="mt-2" id="participantCount"></p>
+    <p id="totalPrize"></p>
+  </div>
+
+  <div class="spinner-container">
+    <div id="wheel">
+      <img src="https://i.ibb.co/tC6Qybc/logo.png" alt="X-Win Logo">
+    </div>
+  </div>
+
+  <button id="drawBtn" class="btn-main px-6 py-3 rounded mb-6 text-lg">🎲 Spin & Draw</button>
+</div>
+
+<!-- Winner Overlay -->
+<div id="winnerOverlay" class="winner-overlay">
+  <div class="winner-center">
+    <div class="winner-text" id="winnerName"></div>
+    <div class="winner-subtext" id="winnerMobile"></div>
+    <div class="winner-prize" id="winnerPrize"></div>
+    <button class="btn-main mt-6 px-6 py-2 rounded" onclick="closeWinner()">Close</button>
+  </div>
+</div>
+
+<!-- Sidebar Winners -->
+<div class="winner-sidebar">
+  <h3>All Winners</h3>
+  <ul id="weeklyList"></ul>
+  <button class="btn-main w-full mt-3" onclick="refreshWinner()">🎉 Refresh Winner</button>
+  <button class="btn-main w-full mt-3 bg-red-600 hover:bg-red-700" onclick="clearWinners()">🗑️ Delete All Winners</button>
+</div>
+
+<canvas id="confetti"></canvas>
+
+<script>
+// Your existing JavaScript code here (keep as-is from your HTML)
+</script>
+</body>
+</html>

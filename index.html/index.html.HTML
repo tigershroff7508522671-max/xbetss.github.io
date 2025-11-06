@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>X-BET | Weekly Draw</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<style>
+body {
+  margin:0;
+  font-family:'Inter',sans-serif;
+  background: linear-gradient(135deg,#0f172a,#1e3a8a);
+  color:#f1f5f9;
+  overflow-x:hidden;
+  display:flex;
+}
+
+/* Main Content */
+.main-content {
+  flex:1;
+  padding:2rem;
+  max-width:800px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+/* Brand */
+.brand {
+  font-size:2.8rem;
+  font-weight:900;
+  letter-spacing:1px;
+  background:linear-gradient(90deg,#3b82f6,#60a5fa,#93c5fd);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+/* Card */
+.card {
+  background:#1e293b;
+  border-radius:1rem;
+  padding:1.5rem;
+  box-shadow:0 4px 20px rgba(0,0,0,0.4);
+  margin-bottom:1rem;
+  width:100%;
+}
+
+/* Buttons */
+.btn-main {
+  background: linear-gradient(90deg,#3b82f6,#60a5fa);
+  color:white;
+  font-weight:700;
+  transition:0.3s;
+  box-shadow:0 0 10px rgba(59,130,246,0.7);
+}
+.btn-main:hover {
+  transform: scale(1.05);
+  background: linear-gradient(90deg,#2563eb,#93c5fd);
+  box-shadow:0 0 20px rgba(59,130,246,0.9);
+}
+
+/* Inputs */
+input {
+  background:#334155;
+  color:#f1f5f9;
+  border:none;
+  border-radius:0.5rem;
+  padding:0.5rem;
+}
+input[readonly] { cursor:not-allowed; }
+
+/* Spinner */
+.spinner-container {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  margin: 40px auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#wheel {
+  width:100%;
+  height:100%;
+  border-radius:50%;
+  background: conic-gradient(#3b82f6 0 20%, #60a5fa 20% 40%, #93c5fd 40% 60%, #3b82f6 60% 80%, #60a5fa 80% 100%);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  transition: transform 5s cubic-bezier(0.33, 1, 0.68, 1);
+  box-shadow:0 0 30px rgba(0,0,0,0.5);
+}
+#wheel img {
+  width:80px;
+  height:80px;
+  pointer-events:none;
+}
+
+/* Winner Overlay */
+.winner-overlay {
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background: radial-gradient(circle, #1e3a8a, #0f172a);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.5s ease;
+}
+.winner-overlay.show { opacity:1; pointer-events:all; }
+.winner-center { text-align:center; }
+
+.winner-text {
+  font-size:5rem;
+  font-weight:900;
+  color:#FFD700;
+  text-shadow: 0 0 20px #FFD700,0 0 40px #FFA500,0 0 60px #FFD700;
+  animation: glowPulse 1s ease-in-out infinite alternate;
+}
+.winner-subtext {
+  font-size:2.5rem;
+  font-weight:700;
+  color:#fff;
+  margin-top:1rem;
+  text-shadow: 0 0 10px #fff,0 0 20px #ffd700;
+}
+.winner-prize {
+  font-size:3rem;
+  font-weight:800;
+  color:#00FF00;
+  margin-top:1rem;
+  text-shadow: 0 0 10px #00FF00,0 0 20px #00FF00;
+}
+@keyframes glowPulse {
+  0%{text-shadow: 0 0 10px #FFD700,0 0 20px #FFA500;}
+  50%{text-shadow: 0 0 25px #FFD700,0 0 40px #FFA500;}
+  100%{text-shadow: 0 0 10px #FFD700,0 0 20px #FFA500;}
+}
+
+/* Flashy winner animation */
+@keyframes flashGlow {
+  0% { text-shadow: 0 0 10px #FFD700, 0 0 20px #FFA500; }
+  50% { text-shadow: 0 0 25px #FFD700, 0 0 40px #FFA500; }
+  100% { text-shadow: 0 0 10px #FFD700, 0 0 20px #FFA500; }
+}
+
+/* Winner Sidebar */
+.winner-sidebar {
+  width:320px;
+  background: rgba(30,41,59,0.95);
+  box-shadow:-2px 0 10px rgba(0,0,0,0.5);
+  padding:1.5rem 1rem;
+  overflow-y:auto;
+  height:100vh;
+  position:fixed;
+  right:0;
+  top:0;
+}
+.winner-sidebar h3 {
+  font-size:1.8rem;
+  font-weight:700;
+  color:#f1f5f9;
+  margin-bottom:1rem;
+  text-align:center;
+  border-bottom:1px solid rgba(255,255,255,0.2);
+  padding-bottom:0.5rem;
+}
+.winner-sidebar ul { list-style:none; padding:0; margin:0; }
+.winner-sidebar li {
+  display:flex;
+  justify-content:space-between;
+  background:#1e40af;
+  margin-bottom:0.5rem;
+  padding:10px;
+  border-radius:8px;
+  font-weight:600;
+  color:#fff;
+  transition:0.3s;
+}
+.winner-sidebar li:hover { background:#2563eb; cursor:pointer; }
+
+/* Confetti */
+canvas { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1; }
+</style>
+</head>
+<body>
+
+<div class="main-content">
+  <header class="text-center mb-6">
+    <div class="brand">X-BET</div>
+    <p class="text-gray-400">30 % amount will goes to owner</p>
+  </header>
+
+  <div class="card">
+    <h2 class="text-xl font-semibold mb-3 text-blue-400">Add Participant</h2>
+    <form id="form">
+      <input type="text" id="name" placeholder="Full Name" class="w-full mb-2" required>
+      <input type="text" id="mobile" placeholder="Mobile Number" maxlength="10" pattern="[0-9]{10}" class="w-full mb-2" required>
+      <input type="number" id="amount" value="5" readonly class="w-full mb-2">
+      <button class="btn-main w-full p-2 rounded">Add</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2 class="text-xl font-semibold mb-3 text-blue-400">Participants</h2>
+    <ul id="list" class="space-y-1 text-gray-200 text-sm"></ul>
+    <p class="mt-2" id="participantCount"></p>
+    <p id="totalPrize"></p>
+  </div>
+
+  <div class="spinner-container">
+    <div id="wheel">
+      <img src="https://i.ibb.co/tC6Qybc/logo.png" alt="X-Win Logo">
+    </div>
+  </div>
+
+  <button id="drawBtn" class="btn-main px-6 py-3 rounded mb-6 text-lg">🎲 Spin & Draw</button>
+</div>
+
+<!-- Winner Overlay -->
+<div id="winnerOverlay" class="winner-overlay">
+  <div class="winner-center">
+    <div class="winner-text" id="winnerName"></div>
+    <div class="winner-subtext" id="winnerMobile"></div>
+    <div class="winner-prize" id="winnerPrize"></div>
+    <button class="btn-main mt-6 px-6 py-2 rounded" onclick="closeWinner()">Close</button>
+  </div>
+</div>
+
+<!-- Sidebar Winners -->
+<div class="winner-sidebar">
+  <h3>All Winners</h3>
+  <ul id="weeklyList"></ul>
+  <button class="btn-main w-full mt-3" onclick="refreshWinner()">🎉 Refresh Winner</button>
+  <button class="btn-main w-full mt-3 bg-red-600 hover:bg-red-700" onclick="clearWinners()">🗑️ Delete All Winners</button>
+</div>
+
+<canvas id="confetti"></canvas>
+
+<script>
+const form=document.getElementById('form');
+const list=document.getElementById('list');
+const drawBtn=document.getElementById('drawBtn');
+const wheel=document.getElementById('wheel');
+const winnerOverlay=document.getElementById('winnerOverlay');
+const winnerNameDiv=document.getElementById('winnerName');
+const winnerMobileDiv=document.getElementById('winnerMobile');
+const winnerPrizeDiv=document.getElementById('winnerPrize');
+const participantCount=document.getElementById('participantCount');
+const totalPrize=document.getElementById('totalPrize');
+const weeklyList=document.getElementById('weeklyList');
+const canvas=document.getElementById('confetti');
+const ctx=canvas.getContext('2d');
+
+let participants=JSON.parse(localStorage.getItem('xwinData'))||[];
+let weeklyWinners=JSON.parse(localStorage.getItem('weeklyWinners'))||[];
+let confetti=[];
+
+function saveData(){ localStorage.setItem('xwinData',JSON.stringify(participants)); }
+function saveWeekly(){ localStorage.setItem('weeklyWinners',JSON.stringify(weeklyWinners)); }
+
+function updateList(){
+  list.innerHTML=participants.map((p,i)=>`<li>${i+1}. ${p.name} (${p.mobile}) — ₹${p.amount}</li>`).join('');
+  participantCount.textContent=`Total Participants: ${participants.length}`;
+  const total = participants.reduce((sum,p)=>sum+p.amount,0);
+  totalPrize.textContent=`Total Prize Amount: ₹${total}`;
+  weeklyList.innerHTML=weeklyWinners.map((w,i)=>`<li>${i+1}. ${w.name} (${w.mobile}) — ₹${w.amount}</li>`).join('');
+}
+
+form.addEventListener('submit',e=>{
+  e.preventDefault();
+  const name=document.getElementById('name').value.trim();
+  const mobile=document.getElementById('mobile').value.trim();
+  const amount=5;
+  if(!name||!mobile)return alert("Please fill all fields.");
+  if(mobile.length!==10||!/^[0-9]+$/.test(mobile)) return alert("Enter valid 10-digit mobile number.");
+  participants.push({name,mobile,amount});
+  saveData();
+  form.reset();
+  updateList();
+});
+
+drawBtn.addEventListener('click',()=>{
+  if(participants.length<1) return alert("Add at least 1 participant.");
+
+  // Total prize calculation
+  const totalPrizeAmount = participants.reduce((sum, p) => sum + p.amount, 0);
+
+  // Spin the wheel
+  const spins=Math.floor(Math.random()*3+3);
+  const stopDegree=Math.floor(Math.random()*360);
+  wheel.style.transition='transform 5s cubic-bezier(0.33,1,0.68,1)';
+  wheel.style.transform=`rotate(${spins*360 + stopDegree}deg)`;
+
+  setTimeout(()=>{
+    const winnerIndex=Math.floor(Math.random()*participants.length);
+    const winner=participants[winnerIndex];
+
+    // Give total prize to winner
+    winner.amount = totalPrizeAmount;
+
+    // Show flashy winner
+    showWinnerFlash(winner);
+
+    // Add winner to weekly list
+    weeklyWinners.push(winner);
+    saveWeekly();
+
+    // Clear all participants
+    participants = [];
+    saveData();
+
+    updateList();
+    launchConfetti();
+  },5000);
+});
+
+function refreshWinner(){
+  if(weeklyWinners.length<1) return alert("No winners yet!");
+  const index=Math.floor(Math.random()*weeklyWinners.length);
+  const winner=weeklyWinners[index];
+  showWinnerFlash(winner);
+  launchConfetti();
+}
+
+function closeWinner(){ 
+  winnerOverlay.classList.remove('show'); 
+  confetti=[];
+  winnerNameDiv.style.animation = ''; 
+}
+
+function clearWinners(){
+  if(!confirm("Are you sure you want to delete all winners?")) return;
+  weeklyWinners = [];
+  saveWeekly();
+  updateList();
+}
+
+// Flashy winner display
+function showWinnerFlash(winner){
+  winnerNameDiv.textContent = winner.name;
+  winnerMobileDiv.textContent = winner.mobile;
+  winnerPrizeDiv.textContent = `🏆 Prize: ₹${winner.amount}`;
+  winnerOverlay.classList.add('show');
+  winnerNameDiv.style.animation = "flashGlow 1s ease-in-out infinite alternate";
+  winnerNameDiv.style.color = "#FFD700";
+  winnerMobileDiv.style.color = "#FFA500";
+  winnerPrizeDiv.style.color = "#00FF00";
+}
+
+// Confetti
+function launchConfetti(){
+  confetti=Array.from({length:200},()=>({ x:Math.random()*canvas.width, y:Math.random()*canvas.height-50, r:Math.random()*6+2, c:`hsl(${Math.random()*360},70%,60%)`, s:Math.random()*3+2 }));
+  animateConfetti();
+}
+function animateConfetti(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  confetti.forEach(p=>{
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,2*Math.PI);
+    ctx.fillStyle=p.c;
+    ctx.fill();
+    p.y+=p.s;
+    if(p.y>canvas.height)p.y=-10;
+  });
+  if(confetti.length>0) requestAnimationFrame(animateConfetti);
+}
+
+window.addEventListener('resize',()=>{ canvas.width=window.innerWidth; canvas.height=window.innerHeight; });
+canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+
+updateList();
+</script>
+</body>
+</html>
